@@ -312,6 +312,7 @@
 				B59946D61F029C8500A41691 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

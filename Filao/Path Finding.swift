@@ -6,21 +6,19 @@
 //  Copyright © 2017 Ben. All rights reserved.
 //
 
-import SpriteKit
-/** PATH FINDING FUNC **/
 
-func buildUp(path:[Point:Point], to:Point) -> [Point] {
-    var total_path = [to]
-    var current = to
-    while path.keys.contains(current) {
-        current = path[current]!
-        total_path.append(current)
+func constructPath (array:[Point:Point], from:Point) -> [Point] {
+    var total_path = [from]
+    var current = from
+    while array.keys.contains(current) {
+        current = array[current]!
+        total_path += [current]
     }
     total_path.reverse()
     return total_path
 }
 
-func getBestPath (start:Point, goal:Point) -> [Point] {
+func getPath (start:Point, goal:Point) -> [Point] {
 
     var closedSet = [Point]()
     var openSet = [start]
@@ -34,21 +32,25 @@ func getBestPath (start:Point, goal:Point) -> [Point] {
         let current = openSet.removeFirst()
 
         if current == goal {
-            return buildUp(path: cameFrom, to: current)
+            return constructPath(array: cameFrom, from: current)
         }
 
-        closedSet.append(current)
+        closedSet += [current]
 
         for neighbor in current.area {
 
-            if closedSet.contains(neighbor) { continue }
+            if closedSet.contains(neighbor) {
+                continue
+            }
 
             if !neighbor.isWalkable {
                 closedSet += [neighbor]
                 continue
             }
 
-            if !(openSet.contains (neighbor)) { openSet += [neighbor] }
+            if !(openSet.contains (neighbor)) {
+                openSet += [neighbor]
+            }
 
             let tentative_gScore = gScore[current]! + neighbor.distanceTo(p:current)
 
@@ -64,18 +66,7 @@ func getBestPath (start:Point, goal:Point) -> [Point] {
         }
 
     }
-    return openSet
+    return []
 }
 
-func bestWay(from:Point, to:Point) {
-    var myway = getBestPath(start:from, goal:to)
 
-    while !myway.isEmpty {
-        let goto = myway.removeFirst()
-
-        if let tile = tileTable[goto] {
-            tile.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
-        }
-        
-    }
-}

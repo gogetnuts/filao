@@ -23,48 +23,38 @@ var globalTime : TimeInterval = 0
 class GameScene: SKScene {
 
     var firstStart = true
-    private var lastUpdateTime : TimeInterval = 0
-    let timerLabel = SKLabelNode ()
-
+    var lastUpdateTime : TimeInterval = 0
 
     override func sceneDidLoad() {
 
-
         if firstStart {
 
-            timerLabel.fontName = "Arial"
-            timerLabel.fontSize = 20
-
-            //self.anchorPoint = CGPoint(x:0, y:0)
-            self.addChild(timerLabel)
-
-            //print(self.size)
-            self.addChild(firstCam)
             firstCam.setScale(CGFloat(0.75))
 
-            let grid = Grid(start: Point(p:(0,0)), line:0)
-            firstCam.addChild(grid)
-            gridTable.updateValue(Point(p:(0,0)), forKey: grid)
+            let grid1 = Grid(start: Point(p:(0,0)), line:0)
+
+            let tilePerLine = grid1.nbTilePerLine
+            let gridLines = grid1.nbLines
 
             let grid2 = Grid(start: Point(p:(tilePerLine,tilePerLine)), line:0)
-            firstCam.addChild(grid2)
             grid2.position.x += CGFloat(tileWidth * tilePerLine)
-            gridTable.updateValue(Point(p:(tilePerLine,tilePerLine)), forKey: grid)
 
             let grid3 = Grid(start: Point(p:(-gridLines/2,gridLines/2)), line:1)
             grid3.position.y -= CGFloat(tileHeight/2 * gridLines)
-            firstCam.addChild(grid3)
 
             let grid4 = Grid(start: Point(p:(-gridLines/2 + tilePerLine,gridLines/2 + tilePerLine)), line:1)
             grid4.position.y -= CGFloat(tileHeight/2 * gridLines)
             grid4.position.x += CGFloat(tileWidth * tilePerLine)
+
+            addChild(firstCam)
+
+            firstCam.addChild(grid1)
+            firstCam.addChild(grid2)
+            firstCam.addChild(grid3)
             firstCam.addChild(grid4)
 
-            //gridTable.updateValue(Point(p:(-5,5)), forKey: grid3)
-
+            firstStart = false
         }
-
-        firstStart = firstStart ? false : true
 
     }
 
@@ -83,21 +73,21 @@ class GameScene: SKScene {
         }
     }
 
-    var lastTileClicked:Tile?
+    var lastTileClicked = Tile(coo:(0,0))
     override func mouseDown(with event: NSEvent) {
 
-
         if let tile = getTileAt(pos:event.location(in: self)) {
-            print("pokeball go")
 
+            var path = getPath(start:lastTileClicked.grid, goal:tile.grid)
 
-            if (lastTileClicked == nil) {
-                lastTileClicked = tile
-            } else {
-                bestWay(from:(lastTileClicked?.grid)!, to: tile.grid)
+            while !path.isEmpty {
+                let nextPoint = path.removeFirst()
+                nextPoint.tile?.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
             }
 
             lastTileClicked = tile
+
+            //Turn tile into water for testing other features
             tile.setTo(newType: .water)
 
         }
@@ -150,20 +140,18 @@ class GameScene: SKScene {
     func getTileAt(pos: CGPoint) -> Tile? {
         let nodesAtPos = nodes(at: pos)
 
+        let tileSquare = CGMutablePath()
+        tileSquare.move(to: CGPoint(x:-tileWidth/2, y:0))
+        tileSquare.addLine(to: CGPoint(x:0, y:-tileHeight/2))
+        tileSquare.addLine(to: CGPoint(x:tileWidth/2, y:0))
+        tileSquare.addLine(to: CGPoint(x:0, y:tileHeight/2))
+        tileSquare.closeSubpath()
+
 
         for node in nodesAtPos {
             if let n = node as? Tile {
 
                 let p = convert(pos, to: n)
-
-                let tileSquare = CGMutablePath()
-                //print(n.anchorPoint.)
-                tileSquare.move(to: CGPoint(x:-tileWidth/2, y:0))
-                tileSquare.addLine(to: CGPoint(x:0, y:-tileHeight/2))
-                tileSquare.addLine(to: CGPoint(x:tileWidth/2, y:0))
-                tileSquare.addLine(to: CGPoint(x:0, y:tileHeight/2))
-                tileSquare.closeSubpath()
-
 
                 if(tileSquare.contains(p)) {
                     return n
