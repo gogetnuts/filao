@@ -39,25 +39,38 @@ class characterMovable : SKSpriteNode {
 
         if tile != characterTile {
             var path = getPath(start:characterTile.point, goal:tile.point)
+            print("path compte \(path.count)")
+            var move = false
+            if path.count >= 2 {
+                path.removeLast()
+                move = true
+            }
 
-            path.removeLast()
             //Run or Walk ?
             let speed = path.count > 3 ? CGFloat(300) : CGFloat(100)
 
             //Draw pathLine
             let pathLine = CGMutablePath()
             pathLine.move(to: position)
-            for point in path {
-                if let tile = point.newtile {
-                    pathLine.addLine(to: tile.positionInCamera)
+
+            if move {
+                for point in path {
+                    if let tile = point.newtile {
+                        pathLine.addLine(to: tile.positionInCamera)
+                    }
                 }
             }
 
+            var skAction = [SKAction]()
+
+            if move {
+                skAction += [SKAction.follow(pathLine, asOffset: false, orientToPath : false, speed: speed)]
+            }
+
+            skAction += [SKAction.dig(tile: tile, duration: 0.2)]
+
             //Execute Action Sequence
-            run(SKAction.sequence([
-                SKAction.follow(pathLine, asOffset: false, orientToPath : false, speed: speed),
-                SKAction.dig(tile: tile, duration: 0.2)
-                ]), withKey: "Run")
+            run(SKAction.sequence(skAction), withKey: "Run")
 
 
             //Turn pathLine into Node

@@ -89,9 +89,6 @@ class newTile:SKShapeNode {
         let maxHumidity = 85.0
         let maxcolorBFactorDif = 0.3
 
-        print(newHumidity)
-        print(self.type.humidity)
-
         if newHumidity != self.type.humidity {
 
             let colorBFac = CGFloat((maxcolorBFactorDif / maxHumidity) * Double(newHumidity))
@@ -230,6 +227,7 @@ struct tileType {
     var humidity:Int = 0
     var growable:Int = 0
     var walkable:Bool {
+        //print(element)
         return element == .earth ? true : false
     }
 

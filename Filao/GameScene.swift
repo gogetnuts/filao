@@ -51,12 +51,13 @@ class GameScene: SKScene {
 
             firstCam.setScale(CGFloat(0.75))
 
-            let tilePerLine = 4
+
 
 
             let newgrid1 = newGrid(start: Point(0,0), line:20)
 
-            /*
+            let tilePerLine = newgrid1.nbTilePerLine //To make sure count is always right
+
             let newgrid2 = newGrid(start: Point(0,tilePerLine), line:30)
             newgrid2.position.x += CGFloat(tileHalfWidth * tilePerLine)
             newgrid2.position.y -= CGFloat(tileHalfHeight * tilePerLine)
@@ -75,18 +76,18 @@ class GameScene: SKScene {
             let newgrid6 = newGrid(start: Point(tilePerLine,tilePerLine * 2), line:30)
             newgrid6.position.x += CGFloat(tileHalfWidth * tilePerLine * 3)
             newgrid6.position.y -= CGFloat(tileHalfHeight * tilePerLine)
-             */
+
 
 
 
             addChild(firstCam)
 
             firstCam.addChild(newgrid1)
-            /*firstCam.addChild(newgrid2)
+            firstCam.addChild(newgrid2)
             firstCam.addChild(newgrid3)
             firstCam.addChild(newgrid4)
             firstCam.addChild(newgrid5)
-            firstCam.addChild(newgrid6)*/
+            firstCam.addChild(newgrid6)
 
             print(newgrid1.zPosition)
 
@@ -247,9 +248,9 @@ class GameScene: SKScene {
 
             //If our friend is lazy, send him somewhere randomly
 
-            /*if !(friend.hasActions()) {
-                //let random = generateRand(max:tileIndex.count-1)
-                //friend.moveTo(tile: tileIndex[random])
+            if !(friend.hasActions()) {
+                let random = generateRand(max:tileIndex.count-1)
+                friend.moveTo(tile: tileIndex[random])
             }
             // */
 

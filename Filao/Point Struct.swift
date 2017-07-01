@@ -19,10 +19,7 @@ struct Point : Hashable {
     var extendedArea:[Point] { return [t, r, b, l] }
     var area:[Point] { return [t, r, b, l, tl, tr, br, bl] }
 
-    //Associated Tile?
-    //var tile:Tile? { return tileTable[self] }
-
-    //Associated Tile?
+    //Associated newTile?
     var newtile:newTile? { return newTileTable[self] }
 
     //Associated Tile isWalkable?

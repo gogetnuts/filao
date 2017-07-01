@@ -20,7 +20,7 @@ class newGrid : SKNode {
         self.origin = start
         super.init()
         generateSprites(true)
-        zPosition = CGFloat(line)
+        //zPosition = CGFloat(line)
     }
 
     required init(coder: NSCoder) {
