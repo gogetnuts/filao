@@ -6,7 +6,7 @@
 //  Copyright © 2017 Ben. All rights reserved.
 //
 
-import Cocoa
+
 import SpriteKit
 import GameplayKit
 
@@ -17,31 +17,25 @@ var toolChamp:NSTextField = NSTextField()
 var toolStep:NSStepper = NSStepper()
 var toolPause:NSButton = NSButton()
 var toolList:NSPopUpButton = NSPopUpButton()
-var toolFilterHumidity:NSButton = NSButton()
-var toolFilterLevel1:NSButton = NSButton()
-var toolPhysics:NSButton = NSButton()
+
+var scNode:GameScene?
 
 
 class ViewController: NSViewController {
 
 
-    @IBOutlet var list: NSPopUpButton!
-   // @IBOutlet var pause: NSButton!
-   // @IBOutlet var filterLevel1: NSButton!
-   // @IBOutlet var filterhumidity: NSButton!
-    //@IBOutlet var champ: NSTextField!
-   // @IBOutlet var physicsbutton: NSButton!
-    //@IBOutlet var step: NSStepper!
-    //@IBOutlet var dayTimeCorner: NSProgressIndicator!
     @IBOutlet var champ: NSTextField!
-    @IBOutlet var filterLevel1: NSButton!
+
     @IBOutlet var skView: SKView!
     @IBOutlet var pause: NSButton!
     @IBOutlet var step: NSStepper!
-    @IBOutlet var filterHumidity: NSButton!
-    @IBOutlet var filterPhysics: NSButton!
+
+    @IBOutlet var filterLevel1: filterButton!
+    @IBOutlet var filterHumidity: filterButton!
+    @IBOutlet var filterPhysics: filterButton!
 
     @IBOutlet var dayTimeCorner: NSProgressIndicator!
+    @IBOutlet var filterGrid: filterButton!
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -51,7 +45,7 @@ class ViewController: NSViewController {
 
             // Get the SKScene from the loaded GKScene
             if let sceneNode = scene.rootNode as! GameScene? {
-
+                scNode = sceneNode
                 // Copy gameplay related content over to the scene
                 //sceneNode.entities = scene.entities
                 //sceneNode.graphs = scene.graphs
@@ -65,24 +59,16 @@ class ViewController: NSViewController {
                 if let view = self.skView {
                     view.presentScene(sceneNode)
 
-
                     view.ignoresSiblingOrder = false
 
                     view.showsFPS = true
                     view.showsNodeCount = true
-                    //view.showsPhysics = true
-
-
-
                 }
                 dayProgressionBar = dayTimeCorner
                 toolChamp = champ
                 toolStep = step
                 toolPause = pause
-                //toolList = list
-                toolFilterHumidity = filterHumidity
-                toolFilterLevel1 = filterLevel1
-                toolPhysics = filterPhysics
+
             }
         }
     }

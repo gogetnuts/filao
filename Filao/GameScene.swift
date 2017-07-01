@@ -7,14 +7,20 @@
 //
 
 import SpriteKit
+import GameplayKit
 
 
 
-var tileTable = [Point: Tile]();
+var tileTable = [Point: newTile]()
+var newTileTable = [Point: newTile]()
+var tileIndex = [newTile]();
 let tileWidth = 120
 let tileHeight = 60
+let tileHalfHeight = tileHeight/2
+let tileHalfWidth = tileWidth/2
 let firstCam = SKCameraNode()
-
+var mainCharacter = characterMovable()
+let tileShape = CGMutablePath()
 
 let tileDistanceToGround = 20
 var globalTime : TimeInterval = 0
@@ -22,84 +28,187 @@ var globalTime : TimeInterval = 0
 
 class GameScene: SKScene {
 
+    //let tileSquare = CGMutablePath()
+
+
     var firstStart = true
     var lastUpdateTime : TimeInterval = 0
+    var label : SKTileMapNode?
+
+    var friend:characterMovable = characterMovable()
 
     override func sceneDidLoad() {
 
+        //chara
+
         if firstStart {
+
+            tileShape.move(to: CGPoint(x:-tileWidth/2, y:0))
+            tileShape.addLine(to: CGPoint(x:0, y:-tileHeight/2))
+            tileShape.addLine(to: CGPoint(x:tileWidth/2, y:0))
+            tileShape.addLine(to: CGPoint(x:0, y:tileHeight/2))
+            tileShape.closeSubpath()
 
             firstCam.setScale(CGFloat(0.75))
 
-            let grid1 = Grid(start: Point(p:(0,0)), line:0)
+            let tilePerLine = 4
 
-            let tilePerLine = grid1.nbTilePerLine
-            let gridLines = grid1.nbLines
 
-            let grid2 = Grid(start: Point(p:(tilePerLine,tilePerLine)), line:0)
-            grid2.position.x += CGFloat(tileWidth * tilePerLine)
+            let newgrid1 = newGrid(start: Point(0,0), line:20)
 
-            let grid3 = Grid(start: Point(p:(-gridLines/2,gridLines/2)), line:1)
-            grid3.position.y -= CGFloat(tileHeight/2 * gridLines)
+            /*
+            let newgrid2 = newGrid(start: Point(0,tilePerLine), line:30)
+            newgrid2.position.x += CGFloat(tileHalfWidth * tilePerLine)
+            newgrid2.position.y -= CGFloat(tileHalfHeight * tilePerLine)
 
-            let grid4 = Grid(start: Point(p:(-gridLines/2 + tilePerLine,gridLines/2 + tilePerLine)), line:1)
-            grid4.position.y -= CGFloat(tileHeight/2 * gridLines)
-            grid4.position.x += CGFloat(tileWidth * tilePerLine)
+            let newgrid3 = newGrid(start: Point(0,tilePerLine * 2), line:40)
+            newgrid3.position.x += CGFloat(tileHalfWidth * tilePerLine * 2)
+            newgrid3.position.y -= CGFloat(tileHalfHeight * tilePerLine * 2)
+
+            let newgrid4 = newGrid(start: Point(tilePerLine,0), line:10)
+            newgrid4.position.x += CGFloat(tileHalfWidth * tilePerLine)
+            newgrid4.position.y += CGFloat(tileHalfHeight * tilePerLine)
+
+            let newgrid5 = newGrid(start: Point(tilePerLine,tilePerLine), line:20)
+            newgrid5.position.x += CGFloat(tileHalfWidth * tilePerLine * 2)
+
+            let newgrid6 = newGrid(start: Point(tilePerLine,tilePerLine * 2), line:30)
+            newgrid6.position.x += CGFloat(tileHalfWidth * tilePerLine * 3)
+            newgrid6.position.y -= CGFloat(tileHalfHeight * tilePerLine)
+             */
+
+
 
             addChild(firstCam)
 
-            firstCam.addChild(grid1)
-            firstCam.addChild(grid2)
-            firstCam.addChild(grid3)
-            firstCam.addChild(grid4)
+            firstCam.addChild(newgrid1)
+            /*firstCam.addChild(newgrid2)
+            firstCam.addChild(newgrid3)
+            firstCam.addChild(newgrid4)
+            firstCam.addChild(newgrid5)
+            firstCam.addChild(newgrid6)*/
+
+            print(newgrid1.zPosition)
+
+
+            if let tile = newTileTable[Point(3,3)] {
+                mainCharacter.position = tile.positionInCamera
+                firstCam.addChild(mainCharacter)
+            }
+
+            if let tile = newTileTable[Point(2,2)] {
+                friend.position = tile.positionInCamera
+                firstCam.addChild(friend)
+            }
+
+            //buiding tileIndex for random tile
+            for (_, tile) in newTileTable {
+                tileIndex.append(tile)
+            }
+
+            //Centering camera on mainCharacter */
+            //firstCam.position.x = -mainCharacter.positionInScene.x
+            //firstCam.position.y = -mainCharacter.positionInScene.y
 
             firstStart = false
+
+
         }
 
     }
-
+/*
+    func getTileAt(point: CGPoint) -> Tile? {
+        let tiles = self.nodes(at: point).filter ({ $0.isMember(of: Tile.self) }) as! [Tile]
+        for tile in tiles {
+            if(tileShape.contains(convert(point, to: tile))) {
+                return tile
+            }
+        }
+        return nil
+    }
+    */
+    func getNewTileAt(point: CGPoint) -> newTile? {
+        let tiles = self.nodes(at: point).filter ({ $0.isMember(of: newTile.self) }) as! [newTile]
+        for tile in tiles {
+            if(tileShape.contains(convert(point, to: tile))) {
+                return tile
+            }
+        }
+        return nil
+    }
+/*
     var lastTile:Tile?
     override func mouseDragged(with event: NSEvent) {
 
-        if let tile = getTileAt(pos:event.location(in: self)) {
+        if let tile = getTileAt(point:event.location(in: self)) {
+
             if lastTile != tile || lastTile == nil {
 
                 lastTile = tile
-                for tiles in tile.grid.area {
-                    tileTable[tiles]?.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.5))
+                for tiles in tile.point.area {
+                    tileTable[tiles]?.addPhysics()
+                    tileTable[tiles]?.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.3))
                 }
-                tile.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.4))
+                tile.addPhysics()
+                tile.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.5))
             }
         }
+    }*/
+
+    override func didSimulatePhysics() {
+        /*for (_, tile) in tileTable.filter({ $1.physicsBody != nil }) {
+            if tile.physicsBody?.velocity.dy == 0 {
+                tile.removePhysics()
+            }
+        }*/
     }
 
-    var lastTileClicked = Tile(coo:(0,0))
+
     override func mouseDown(with event: NSEvent) {
-
-        if let tile = getTileAt(pos:event.location(in: self)) {
-
-            var path = getPath(start:lastTileClicked.grid, goal:tile.grid)
-
-            while !path.isEmpty {
-                let nextPoint = path.removeFirst()
-                nextPoint.tile?.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
-            }
-
-            lastTileClicked = tile
-
-            //Turn tile into water for testing other features
-            tile.setTo(newType: .water)
-
+        if let tile = getNewTileAt(point:event.location(in: self)) {
+            print(tile.point)
+            mainCharacter.makeRunTo(tile: tile)
         }
+
+        /*
+         let texture:SKTexture? = self.view?.texture(from: Grid(start: Point(0,0), line:0))
+        let node = SKSpriteNode(texture: texture)
+        node.position.x = 400
+        print(superView)
+        self.addChild(node)
+        */
     }
 
     override func keyDown(with event: NSEvent) {
-        print(event.keyCode)
         let code = event.keyCode
+        print(code)
+
+        //Space Bar is Pause Button for DayProgression
+        if (event.keyCode == 49) {
+            toolPause.state = toolPause.state == 0 ? 1 : 0
+        }
+
+        //Enter generate
+        if (event.keyCode == 36) {
+            let grids = firstCam.children.filter ({ $0.isMember(of: newGrid.self) }) as! [newGrid]
+            for grid in grids {
+                grid.setTextureMap()
+            }
+        }
+        //Backspace delete
+        if (event.keyCode == 51) {
+            let grids = firstCam.children.filter ({ $0.isMember(of: newGrid.self) }) as! [newGrid]
+            for grid in grids {
+                grid.removeTextureMap()
+            }
+        }
+
+
+        // Camera Movement
+        var moveCamera = true
 
         var x = CGFloat(tileWidth/2) * firstCam.xScale
         var y = CGFloat(tileHeight/2) * firstCam.yScale
-        var go = true
 
         switch (code) {
         case 126:
@@ -110,148 +219,105 @@ class GameScene: SKScene {
         case 124:
             x = -x
         case 125: break
-        default: go = false
+        default: moveCamera = false
         }
 
-        if go {
+        if moveCamera {
             firstCam.run(SKAction.moveBy(x: x, y: y, duration: 0.5))
-
-            //for grid in gridTable {
-            //  print(firstCam.contains(grid.key))
-            // }
-
         }
 
-        if (event.keyCode == 24) {
-            firstCam.xScale += 0.1
-            firstCam.yScale += 0.1
-        }
-        if (event.keyCode == 49) {
-            toolPause.state = toolPause.state == 0 ? 1 : 0
-        }
-        if (event.keyCode == 44) {
-            if (firstCam.xScale > 0.2 && firstCam.yScale > 0.2) {
-                firstCam.xScale -= 0.1
-                firstCam.yScale -= 0.1
-            }
-        }
     }
-
-    func getTileAt(pos: CGPoint) -> Tile? {
-        let nodesAtPos = nodes(at: pos)
-
-        let tileSquare = CGMutablePath()
-        tileSquare.move(to: CGPoint(x:-tileWidth/2, y:0))
-        tileSquare.addLine(to: CGPoint(x:0, y:-tileHeight/2))
-        tileSquare.addLine(to: CGPoint(x:tileWidth/2, y:0))
-        tileSquare.addLine(to: CGPoint(x:0, y:tileHeight/2))
-        tileSquare.closeSubpath()
-
-
-        for node in nodesAtPos {
-            if let n = node as? Tile {
-
-                let p = convert(pos, to: n)
-
-                if(tileSquare.contains(p)) {
-                    return n
-                }
-            }
-        }
-        return nil
+    
+    func generateRand(max:Int) -> Int {
+        let ok = GKRandomDistribution(lowestValue: 0, highestValue: max)
+        return ok.nextInt()
     }
-
-
 
     var dayLapse = 0
     var lastSunRise:TimeInterval = 0
     var timePause:TimeInterval = 0
-    var timePerDay = 2.0
-    var filterHumidity:Int = toolFilterHumidity.state
-    var filterLevel1:Int = toolFilterLevel1.state
-    var filterPhysics:Int = toolPhysics.state
+
+    var lastRefresh:TimeInterval = 0
     override func update(_ currentTime: TimeInterval) {
-        if lastSunRise == 0 { lastSunRise = currentTime }
 
-        if toolPause.state == 0 {
+        let refreshTime = currentTime - lastRefresh
+        if  refreshTime > 1 {
 
-            timePerDay = toolStep.doubleValue
+            lastRefresh = currentTime
 
-            if timePause != 0 {
-                lastSunRise += (currentTime - timePause)
-                timePause = 0
+            //If our friend is lazy, send him somewhere randomly
+
+            /*if !(friend.hasActions()) {
+                //let random = generateRand(max:tileIndex.count-1)
+                //friend.moveTo(tile: tileIndex[random])
             }
+            // */
 
-            let dayProgression = (currentTime - lastSunRise) * 100 / timePerDay
+            /*
+            //Performance test
 
-            dayProgressionBar.doubleValue = dayProgression
+            let ok = getPath(start: Point(0,0), goal: Point(4,8))
+            let ok2 = getPath(start: Point(4,8), goal: Point(0,0))
+            let ok3 = getPath(start: Point(0,0), goal: Point(1,8))
+            let ok4 = getPath(start: Point(1,8), goal: Point(0,0))
+            // */
+            /*
+            let grid1 = Grid(start: Point(0,0), line:0)
+            let tilePerLine = grid1.nbTilePerLine
 
-            if dayProgression >= 100 {
-                dayLapse += 1
-                toolChamp.stringValue = dayLapse.description
+            firstCam.childNode(withName: "grid1")?.removeFromParent()
+            var texture:SKTexture? = compileTexture(node: grid1)
+            var node = SKSpriteNode(texture: texture)
+            node.position.x -= CGFloat(tileWidth/2)
+            node.position.y += CGFloat(tileHeight/2)
+            node.anchorPoint = CGPoint(x:0,y:1)
+            node.size = CGSize(width: 540, height: 330)
+            node.name = "grid1"
 
-                lastSunRise = currentTime
-                raiseWater()
-            }
+            firstCam.addChild(node)
+            
+            firstCam.childNode(withName: "grid2")?.removeFromParent()
+            texture = compileTexture(node: Grid(start: Point(tilePerLine,tilePerLine), line:0))
+            node = SKSpriteNode(texture: texture)
+            node.position.x += CGFloat(tileWidth * tilePerLine)
+            node.position.x -= CGFloat(tileWidth/2)
+            node.position.y += CGFloat(tileHeight/2)
+            node.anchorPoint = CGPoint(x:0,y:1)
+            node.size = CGSize(width: 540, height: 330)
+            node.name = "grid2"
 
-        } else {
-            if timePause == 0 { timePause = currentTime }
-        }
+            firstCam.addChild(node)
 
-        //Humidity TOGGLE
+            */
+            if toolPause.state == 0 {
 
-        if toolFilterHumidity.state == 0 {
-            if filterHumidity == 1 {
-                for (_, tile) in tileTable {
-                    tile.text.removeFromParent()
+                if lastSunRise == 0 { lastSunRise = currentTime }
+
+                let timePerDay = toolStep.doubleValue
+
+                if timePause != 0 {
+                    lastSunRise += (currentTime - timePause)
+                    timePause = 0
                 }
-                filterHumidity = 0
-            }
-        } else {
-            if filterHumidity == 0 {
-                for (_, tile) in tileTable {
-                    //for (_, tile) in tileTable.filter({ ($1?.type.humidity)! > 0 }) {
-                    tile.addChild(tile.text)
-                }
-                filterHumidity = 1
-            }
 
-        }
+                let dayProgression = (currentTime - lastSunRise) * 100 / timePerDay
 
-        //Level1 TOGGLE
+                dayProgressionBar.doubleValue = dayProgression
 
-        if toolFilterLevel1.state == 0 {
-            if filterLevel1 == 1 {
-                for (_, tile) in tileTable {
-                    tile.level1.removeFromParent()
+                if dayProgression >= 100 {
+                    dayLapse += 1
+                    toolChamp.stringValue = dayLapse.description
+
+                    lastSunRise = currentTime
+                    raiseWater()
                 }
-                filterLevel1 = 0
-            }
-        } else {
-            if filterLevel1 == 0 {
-                for (_, tile) in tileTable {
-                    //for (_, tile) in tileTable.filter({ $1?.level1.texture != nil }) {
-                    tile.addChild(tile.level1)
-                }
-                filterLevel1 = 1
+                
+            } else {
+                if timePause == 0 && lastSunRise != 0 { timePause = currentTime }
             }
             
         }
-        
-        //Physics TOGGLE
-        
-        if toolPhysics.state == 0 {
-            if filterPhysics == 1 {
-                self.scene?.view?.showsPhysics = false
-                filterPhysics = 0
-            }
-        } else {
-            if filterPhysics == 0 {
-                self.scene?.view?.showsPhysics = true
-                filterPhysics = 1
-            }
-            
-        }
+
     }
     
 }

@@ -20,8 +20,11 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>LSMinimumSystemVersion</key>
-	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>LSMinimumSystemVersionByArchitecture</key>
+	<dict>
+		<key>i386</key>
+		<string>10.0.0</string>
+	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2017 Ben. All rights reserved.</string>
 	<key>NSMainStoryboardFile</key>
