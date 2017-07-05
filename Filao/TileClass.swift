@@ -1,5 +1,5 @@
 //
-//  newTileClass.swift
+//  TileClass.swift
 //  Filao
 //
 //  Created by Ben on 30/06/2017.
@@ -10,8 +10,12 @@ import SpriteKit
 import GameplayKit
 
 
+class Tile:SKNode {
+    var parentGrid:Grid? {
+        let layer = self.parent as! Layer
+        return layer.grid
 
-class newTile:SKShapeNode {
+    }
     var point:Point
     var type:tileType
     let text:SKLabelNode
@@ -19,7 +23,7 @@ class newTile:SKShapeNode {
     var bound = SKNode()
     var bitMask:UInt32 = 1
     let level0:SKSpriteNode
-    var shape:SKShapeNode
+    //var shape:SKShapeNode
 
     var positionInCamera:CGPoint {
         return firstCam.convert(self.position, from:self.parent!)
@@ -39,25 +43,18 @@ class newTile:SKShapeNode {
         level0.name = "level0"
         level0.zPosition = -1
 
-        bound.physicsBody = SKPhysicsBody (edgeFrom: CGPoint(x:-10, y: -5), to:CGPoint(x: 10, y: -5))
+        bound.physicsBody = SKPhysicsBody(edgeFrom: CGPoint(x:-10, y: -5), to:CGPoint(x: 10, y: -5))
         bound.physicsBody?.restitution = 0.5
-        
-        shape = SKShapeNode(path: tileShape)
-        //shape.lineWidth = 0
+
         super.init()
 
         addChild(level0)
-
-        path = tileShape
-        fillColor = SKColor.clear
-        strokeColor = SKColor.clear
-        //zPosition = 100000
-        //lineWidth = 0
 
     }
 
     func addPhysics() {
         if !(children.contains(bound)) && physicsBody == nil {
+
             physicsBody = SKPhysicsBody(circleOfRadius: 5)
             physicsBody?.isDynamic = true
             physicsBody?.categoryBitMask = UInt32(1 << 31)
@@ -80,7 +77,7 @@ class newTile:SKShapeNode {
         var hScore = 0
 
         for points in point.area {
-            if let neighbor = points.newtile {
+            if let neighbor = points.tile {
                 hScore += neighbor.type.humidity
             }
         }
@@ -89,14 +86,16 @@ class newTile:SKShapeNode {
         let maxHumidity = 85.0
         let maxcolorBFactorDif = 0.3
 
-        if newHumidity != self.type.humidity {
+        if newHumidity != self.type.humidity && newHumidity >= self.type.humidity + 5  {
 
             let colorBFac = CGFloat((maxcolorBFactorDif / maxHumidity) * Double(newHumidity))
 
-            removeAction(forKey: "Humidity")
+            //removeAction(forKey: "Humidity")
 
             //level0.run(SKAction.colorize(withColorBlendFactor: colorBFac, duration: 0), withKey: "Humidity")
             level0.colorBlendFactor = colorBFac
+
+            parentGrid?.updateBitmap = true
 
             type.humidity = newHumidity
 
@@ -109,25 +108,7 @@ class newTile:SKShapeNode {
     }
 
     func growGrass() {
-        if(type.element == .earth) {
-            if(type.humidity > 10) {
-                let texture = SKTexture(image: #imageLiteral(resourceName: "grass1"))
-                level1.texture = texture
-                level1.size = texture.size()
-            }
-            if(type.humidity > 20) {
-                let texture = SKTexture(image: #imageLiteral(resourceName: "grass2"))
-                level1.texture = texture
-                level1.size = texture.size()
-            }
-            if(type.humidity > 40) {
-                let texture = SKTexture(image: #imageLiteral(resourceName: "grass3"))
-                level1.texture = texture
-                level1.size = texture.size()
-            }
-        }
 
-        //level1.colorBlendFactor = colorBlendFactor - 0.03
     }
 
     func setTo (newType:Elements) {
@@ -137,14 +118,9 @@ class newTile:SKShapeNode {
 
             type.element = .water
 
-            let texture = type.texture
-
-            removeAction(forKey: "Humidity")
-
-            level0.run(SKAction.group([
-                SKAction.colorize(withColorBlendFactor: 0, duration: 0),
-                SKAction.setTexture(texture, resize: true),
-                ]), withKey: "Humidity")
+            level0.texture = type.texture
+            level0.size = type.texture.size()
+            level0.colorBlendFactor = 0
 
             type.humidity = 100
 
@@ -152,6 +128,8 @@ class newTile:SKShapeNode {
             level1.texture = nil
             level1.size = CGSize(width: 0, height: 0)
             level1.removeFromParent()
+
+            parentGrid?.updateBitmap = true
 
 
         default :
@@ -167,7 +145,7 @@ class newTile:SKShapeNode {
 }
 
 func raiseWater() {
-    for (_, tile) in newTileTable.filter({ $1.type.element == .earth }) {
+    for (_, tile) in tileTable.filter({ $1.type.element == .earth }) {
 
         tile.calcHumidity()
         //tile.growGrass()
@@ -182,7 +160,7 @@ extension SKAction {
         var humidity:Int = 0
         print("animation for :\(value) for \(self)")
         return SKAction.customAction(withDuration: duration, actionBlock: { (n:SKNode, i:CGFloat) in
-            if let tile = n as? newTile {
+            if let tile = n as? Tile {
 
 
                 if firstTime {
@@ -194,24 +172,11 @@ extension SKAction {
                 tile.text.text = ok.description
                 tile.type.humidity = ok
 
-                print("ok")
-
             }
 
         })
     }
-    open class func dig(tile:SKNode, duration:TimeInterval) -> SKAction {
 
-        return SKAction.customAction(withDuration: duration, actionBlock: { (n:SKNode, i:CGFloat) in
-            if let t = tile as? newTile {
-                if i >= CGFloat(duration) {
-
-                    t.setTo(newType: .water)
-                }
-            }
-        })
-    }
-    
 }
 
 
@@ -227,7 +192,6 @@ struct tileType {
     var humidity:Int = 0
     var growable:Int = 0
     var walkable:Bool {
-        //print(element)
         return element == .earth ? true : false
     }
 
@@ -238,7 +202,7 @@ struct tileType {
         case .water:
             return SKTexture(image: #imageLiteral(resourceName: "Water_Iso_Center"))
         default:
-            return SKTexture(image: #imageLiteral(resourceName: "Sand_Iso_Center"))
+            return SKTexture(image: #imageLiteral(resourceName: "grass"))
         }
     }
     var crossable:Bool = false

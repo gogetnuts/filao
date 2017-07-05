@@ -11,8 +11,17 @@ class characterMovable : SKSpriteNode {
     var positionInScene: CGPoint {
         return scene!.convert(position, from:firstCam)
     }
+
+    var point:Point {
+        return scNode!.getTileAt(point:scNode!.convert(position, from:parent!))!.point
+    }
+
+    var tile:Tile? {
+        return scNode!.getTileAt(point:scNode!.convert(position, from:parent!))
+    }
     
     init() {
+        //self.contains
 
         let texture = SKTexture(image: #imageLiteral(resourceName: "character"))
 
@@ -28,100 +37,157 @@ class characterMovable : SKSpriteNode {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func makeRunTo(tile:newTile) {
+    func digTo(destination:Tile) {
 
-        //Get tile character is on
-        let characterTile = scNode!.getNewTileAt(point:scNode!.convert(position, from:parent!))!
 
-        if hasActions() {
-            removeAction(forKey: "Run")
-        }
+        if let currentPosition = self.tile {
+            if destination != currentPosition  {
+                removeAction(forKey: "Run")
 
-        if tile != characterTile {
-            var path = getPath(start:characterTile.point, goal:tile.point)
-            print("path compte \(path.count)")
-            var move = false
-            if path.count >= 2 {
-                path.removeLast()
-                move = true
-            }
+                var path = getPath(start:currentPosition.point, goal:destination.point)
 
-            //Run or Walk ?
-            let speed = path.count > 3 ? CGFloat(300) : CGFloat(100)
+                if !path.isEmpty {
 
-            //Draw pathLine
-            let pathLine = CGMutablePath()
-            pathLine.move(to: position)
+                    var sequencedAction = [SKAction]()
 
-            if move {
-                for point in path {
-                    if let tile = point.newtile {
-                        pathLine.addLine(to: tile.positionInCamera)
+                    let pointToDig = path.last!
+
+                    if path.count > 1 {
+                        path.removeLast() //Do not walk on last
+                        sequencedAction += [runningActionSequence(path:path)]
                     }
+
+                    sequencedAction += [SKAction.dig(tile: pointToDig.tile!, duration: 0)]
+                    
+                    self.run(SKAction.sequence(sequencedAction), withKey: "Run")
                 }
+                
             }
-
-            var skAction = [SKAction]()
-
-            if move {
-                skAction += [SKAction.follow(pathLine, asOffset: false, orientToPath : false, speed: speed)]
-            }
-
-            skAction += [SKAction.dig(tile: tile, duration: 0.2)]
-
-            //Execute Action Sequence
-            run(SKAction.sequence(skAction), withKey: "Run")
-
-
-            //Turn pathLine into Node
-            firstCam.childNode(withName: "shape1")?.removeFromParent()
-            let shape = SKShapeNode(path: pathLine)
-            shape.name = "shape1"
-            shape.zPosition = 100
-            firstCam.addChild(shape)
-            
-        }
-    }
-    func moveTo(tile:newTile) {
-
-        //Get tile character is on
-        let characterTile = scNode!.getNewTileAt(point:scNode!.convert(position, from:parent!))!
-
-        if hasActions() {
-            removeAction(forKey: "Run")
-        }
-
-        if tile != characterTile {
-            let path = getPath(start:characterTile.point, goal:tile.point)
-
-            //Run or Walk ?
-            let speed:CGFloat = path.count > 3 ? 300 : 100
-
-            //Draw pathLine
-            let pathLine = CGMutablePath()
-            pathLine.move(to: position)
-            for point in path {
-                if let tile = point.newtile {
-                    pathLine.addLine(to: tile.positionInCamera)
-                }
-            }
-
-            //Execute Action Sequence
-            run(SKAction.sequence([
-                SKAction.follow(pathLine, asOffset: false, orientToPath: false, speed: speed)
-                ]), withKey: "Run")
-
-            //SKAction.dig(tile: tile, duration: 0.2)
-
-            //Turn pathLine into Node
-            firstCam.childNode(withName: "shape")?.removeFromParent()
-            let shape = SKShapeNode(path: pathLine)
-            shape.name = "shape"
-            shape.zPosition = 100
-            firstCam.addChild(shape)
-            
         }
     }
 
+    func moveTo(destination:Tile) {
+        if let currentPosition = self.tile {
+            if destination != currentPosition {
+                removeAction(forKey: "Run")
+
+                let path = getPath(start:currentPosition.point, goal:destination.point)
+
+                if !path.isEmpty {
+                    self.run(runningActionSequence(path:path), withKey: "Run")
+                }
+                
+            }
+        }
+    }
+
+    func runningActionSequence(path:[Point]) -> SKAction {
+
+        //Run or Walk ?
+        var speed:CGFloat = path.count > 3 ? 300 : 100
+
+        //If not main character
+        if(name != "main") {
+            speed /= 2
+        }
+
+        //Draw GlobalPathLine
+        let globalPathLine = CGMutablePath()
+        globalPathLine.move(to: position)
+
+        //Points left for each point
+        var pathRemaining = path
+
+        var sequencedAction = [SKAction]()
+
+        //lastPoint is actual position
+        var lastPoint = position
+
+        for point in pathRemaining {
+
+            let sequencedPathLine = CGMutablePath()
+            sequencedPathLine.move(to: lastPoint)
+
+            if let tile = point.tile {
+
+                let nextPoint = tile.positionInCamera
+
+                globalPathLine.addLine(to: nextPoint)
+                sequencedPathLine.addLine(to: nextPoint)
+
+                pathRemaining.removeFirst()
+
+                let action = SKAction.follow(sequencedPathLine, asOffset: false, orientToPath : false, speed: speed)
+
+                let check = SKAction.checkPath(path: pathRemaining, duration: action.duration)
+
+                sequencedAction += [SKAction.group([action, check])]
+
+                lastPoint = nextPoint
+            }
+            
+        }
+        let tileShape = CGMutablePath()
+        tileShape.move(to: CGPoint(x:lastPoint.x-CGFloat(tileHalfWidth), y:lastPoint.y))
+        tileShape.addLine(to: CGPoint(x:lastPoint.x, y:lastPoint.y-CGFloat(tileHalfHeight)))
+        tileShape.addLine(to: CGPoint(x:lastPoint.x+CGFloat(tileHalfWidth), y:lastPoint.y))
+        tileShape.addLine(to: CGPoint(x:lastPoint.x, y:lastPoint.y+CGFloat(tileHalfHeight)))
+        tileShape.closeSubpath()
+
+        globalPathLine.addPath(tileShape)
+
+        //Turn globalPathLine into Node
+        let nameShape = "\(self.name!)1"
+        firstCam.childNode(withName:nameShape)?.removeFromParent()
+        let shape = SKShapeNode(path: globalPathLine)
+        shape.name = nameShape
+        shape.zPosition = 100
+        firstCam.addChild(shape)
+
+        return SKAction.sequence(sequencedAction)
+    }
 
 }
+
+//Customized Animation
+extension SKAction {
+
+    open class func dig(tile:SKNode, duration:TimeInterval) -> SKAction {
+
+        return SKAction.customAction(withDuration: duration, actionBlock: { (n:SKNode, i:CGFloat) in
+            if let t = tile as? Tile {
+                if i >= CGFloat(duration) {
+
+                    t.setTo(newType: .water)
+                }
+            }
+        })
+    }
+
+    open class func checkPath(path:Any, duration:TimeInterval) -> SKAction {
+
+        let refreshInterval:CGFloat = 0.1
+
+        var lastUpdate:CGFloat = 0
+        return SKAction.customAction(withDuration: duration, actionBlock: { (n:SKNode, i:CGFloat) in
+
+            let refreshTime = i - lastUpdate
+            if refreshTime > refreshInterval {
+
+                let tiles = path as! [Point]
+                let error = tiles.filter({ !($0.tile?.type.walkable)! }) as [Point]
+                if !error.isEmpty {
+                    let node = n as! characterMovable
+                    node.removeAction(forKey: "Run")
+                    node.moveTo(destination: tiles.last!.tile!)
+                }
+
+                lastUpdate = i
+
+            }
+
+        })
+    }
+    
+}
+

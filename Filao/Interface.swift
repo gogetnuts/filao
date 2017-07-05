@@ -9,6 +9,10 @@
 
 import SpriteKit
 
+class segmentedButton : NSSegmentedControl {
+
+}
+
 class filterButton : NSButton  {
 
     override open func mouseDown(with event: NSEvent) {
@@ -18,22 +22,22 @@ class filterButton : NSButton  {
 
         case "Humidity" :
             if state == 1 {
-                for (_, tile) in newTileTable {
+                for (_, tile) in tileTable {
                     tile.text.removeFromParent()
                 }
             } else {
-                for (_, tile) in newTileTable {
+                for (_, tile) in tileTable {
                     tile.addChild(tile.text)
                 }
             }
 
         case "Level 1" :
             if state == 1 {
-                for (_, tile) in newTileTable {
+                for (_, tile) in tileTable {
                     tile.level1.removeFromParent()
                 }
             } else {
-                for (_, tile) in newTileTable {
+                for (_, tile) in tileTable {
                     tile.addChild(tile.level1)
                 }
             }
@@ -46,12 +50,12 @@ class filterButton : NSButton  {
             }
         case "Grid" :
             if state == 1 {
-                for (_, tile) in newTileTable {
-                    tile.strokeColor = SKColor.clear
+                for (_, tile) in tileTable {
+                    //tile.strokeColor = SKColor.clear
                 }
             } else {
-                for (_, tile) in newTileTable {
-                    tile.strokeColor = SKColor.white
+                for (_, tile) in tileTable {
+                    //tile.strokeColor = SKColor.white
                 }
             }
         default : break

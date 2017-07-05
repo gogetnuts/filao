@@ -12,11 +12,13 @@ import GameplayKit
 
 
 var selectedTool:Int = 0
-var dayProgressionBar : NSProgressIndicator = NSProgressIndicator()
-var toolChamp:NSTextField = NSTextField()
-var toolStep:NSStepper = NSStepper()
-var toolPause:NSButton = NSButton()
-var toolList:NSPopUpButton = NSPopUpButton()
+var dayProgressionBar = NSProgressIndicator()
+var toolChamp = NSTextField()
+var toolStep = NSStepper()
+var toolPause = NSButton()
+var toolList = NSPopUpButton()
+
+var selectedAction = NSSegmentedControl()
 
 var scNode:GameScene?
 
@@ -33,6 +35,7 @@ class ViewController: NSViewController {
     @IBOutlet var filterLevel1: filterButton!
     @IBOutlet var filterHumidity: filterButton!
     @IBOutlet var filterPhysics: filterButton!
+    @IBOutlet var SegmentedAction: NSSegmentedControl!
 
     @IBOutlet var dayTimeCorner: NSProgressIndicator!
     @IBOutlet var filterGrid: filterButton!
@@ -59,15 +62,18 @@ class ViewController: NSViewController {
                 if let view = self.skView {
                     view.presentScene(sceneNode)
 
-                    view.ignoresSiblingOrder = false
+                    view.ignoresSiblingOrder = true
 
                     view.showsFPS = true
                     view.showsNodeCount = true
+                    //view.showsQuadCount = true
+                    
                 }
                 dayProgressionBar = dayTimeCorner
                 toolChamp = champ
                 toolStep = step
                 toolPause = pause
+                selectedAction = SegmentedAction
 
             }
         }

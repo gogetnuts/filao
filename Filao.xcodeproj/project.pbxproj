@@ -17,8 +17,9 @@
 		B59946D81F029C9500A41691 /* Point Struct.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59946D71F029C9500A41691 /* Point Struct.swift */; };
 		B59946DE1F029CA400A41691 /* Path Finding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59946DD1F029CA400A41691 /* Path Finding.swift */; };
 		B59946E01F029EC900A41691 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B59946DF1F029EC900A41691 /* Assets.xcassets */; };
-		B5D835001F06F16700E2EC89 /* newTileClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D834FF1F06F16700E2EC89 /* newTileClass.swift */; };
-		B5D835021F06F48400E2EC89 /* newGridClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D835011F06F48400E2EC89 /* newGridClass.swift */; };
+		B5BDA5341F0AD0AD0081470B /* LayerClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BDA5331F0AD0AD0081470B /* LayerClass.swift */; };
+		B5D835001F06F16700E2EC89 /* TileClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D834FF1F06F16700E2EC89 /* TileClass.swift */; };
+		B5D835021F06F48400E2EC89 /* GridClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D835011F06F48400E2EC89 /* GridClass.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,8 +35,9 @@
 		B59946D71F029C9500A41691 /* Point Struct.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Point Struct.swift"; sourceTree = "<group>"; };
 		B59946DD1F029CA400A41691 /* Path Finding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path Finding.swift"; sourceTree = "<group>"; };
 		B59946DF1F029EC900A41691 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B5D834FF1F06F16700E2EC89 /* newTileClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = newTileClass.swift; sourceTree = "<group>"; };
-		B5D835011F06F48400E2EC89 /* newGridClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = newGridClass.swift; sourceTree = "<group>"; };
+		B5BDA5331F0AD0AD0081470B /* LayerClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayerClass.swift; sourceTree = "<group>"; };
+		B5D834FF1F06F16700E2EC89 /* TileClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TileClass.swift; sourceTree = "<group>"; };
+		B5D835011F06F48400E2EC89 /* GridClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GridClass.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,8 +73,9 @@
 				B59946DD1F029CA400A41691 /* Path Finding.swift */,
 				B535B5A61F05542300559E4B /* Character Class.swift */,
 				B59946D71F029C9500A41691 /* Point Struct.swift */,
-				B5D834FF1F06F16700E2EC89 /* newTileClass.swift */,
-				B5D835011F06F48400E2EC89 /* newGridClass.swift */,
+				B5D834FF1F06F16700E2EC89 /* TileClass.swift */,
+				B5BDA5331F0AD0AD0081470B /* LayerClass.swift */,
+				B5D835011F06F48400E2EC89 /* GridClass.swift */,
 				B59946C81F029C8500A41691 /* GameScene.swift */,
 				B59946DF1F029EC900A41691 /* Assets.xcassets */,
 				B50C039B1F06BD7A001E6F5B /* Interface.swift */,
@@ -158,13 +161,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				B59946D81F029C9500A41691 /* Point Struct.swift in Sources */,
-				B5D835021F06F48400E2EC89 /* newGridClass.swift in Sources */,
+				B5D835021F06F48400E2EC89 /* GridClass.swift in Sources */,
 				B59946CB1F029C8500A41691 /* ViewController.swift in Sources */,
 				B535B5A71F05542300559E4B /* Character Class.swift in Sources */,
 				B59946C91F029C8500A41691 /* GameScene.swift in Sources */,
 				B59946C31F029C8500A41691 /* AppDelegate.swift in Sources */,
-				B5D835001F06F16700E2EC89 /* newTileClass.swift in Sources */,
+				B5D835001F06F16700E2EC89 /* TileClass.swift in Sources */,
 				B59946DE1F029CA400A41691 /* Path Finding.swift in Sources */,
+				B5BDA5341F0AD0AD0081470B /* LayerClass.swift in Sources */,
 				B50C039C1F06BD7A001E6F5B /* Interface.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
