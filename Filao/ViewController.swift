@@ -49,6 +49,7 @@ class ViewController: NSViewController {
             // Get the SKScene from the loaded GKScene
             if let sceneNode = scene.rootNode as! GameScene? {
                 scNode = sceneNode
+
                 // Copy gameplay related content over to the scene
                 //sceneNode.entities = scene.entities
                 //sceneNode.graphs = scene.graphs
@@ -67,6 +68,7 @@ class ViewController: NSViewController {
                     view.showsFPS = true
                     view.showsNodeCount = true
                     //view.showsQuadCount = true
+                    
                     
                 }
                 dayProgressionBar = dayTimeCorner

@@ -12,9 +12,11 @@ import GameplayKit
 
 class Tile:SKNode {
     var parentGrid:Grid? {
-        let layer = self.parent as! Layer
-        return layer.grid
-
+        if let layer = self.parent as? Layer {
+            return layer.grid
+        } else {
+            return nil
+        }
     }
     var point:Point
     var type:tileType
@@ -25,8 +27,12 @@ class Tile:SKNode {
     let level0:SKSpriteNode
     //var shape:SKShapeNode
 
-    var positionInCamera:CGPoint {
-        return firstCam.convert(self.position, from:self.parent!)
+    var positionInCamera:CGPoint? {
+        if let parent = self.parent {
+            return firstCam.convert(self.position, from:parent)
+        } else {
+            return nil
+        }
     }
 
     init(coo:(x:Int, y:Int)) {
@@ -72,6 +78,11 @@ class Tile:SKNode {
         }
     }
 
+    func riseUp() {
+        position.y += 10
+        parentGrid?.updateBitmap = true
+    }
+
     func calcHumidity() {
 
         var hScore = 0
@@ -100,7 +111,7 @@ class Tile:SKNode {
             type.humidity = newHumidity
 
             if newHumidity > 83 {
-                setTo(newType: .water)
+                //setTo(newType: .water)
             }
 
         }

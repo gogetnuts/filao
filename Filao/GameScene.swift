@@ -41,7 +41,7 @@ class GameScene: SKScene {
 
 
         if firstStart {
-
+            //scNode?.physicsBody = nil
             tileShape.move(to: CGPoint(x:-tileWidth/2, y:0))
             tileShape.addLine(to: CGPoint(x:0, y:-tileHeight/2))
             tileShape.addLine(to: CGPoint(x:tileWidth/2, y:0))
@@ -85,14 +85,14 @@ class GameScene: SKScene {
             firstCam.addChild(newgrid6)
 
 
-            if let tile = tileTable[Point(3,3)] {
-                mainCharacter.position = tile.positionInCamera
+            if let tile = tileTable[Point(3,3)], let position = tile.positionInCamera {
+                mainCharacter.position = position
                 mainCharacter.name = "main"
                 firstCam.addChild(mainCharacter)
             }
 
-            if let tile = tileTable[Point(2,2)] {
-                friend.position = tile.positionInCamera
+            if let tile = tileTable[Point(2,2)], let position = tile.positionInCamera {
+                friend.position = position
                 friend.name = "friend"
                 firstCam.addChild(friend)
             }
@@ -118,10 +118,10 @@ class GameScene: SKScene {
         let grids = self.nodes(at: point).filter ({ $0.isMember(of: Grid.self) }) as! [Grid]
         //print("go")
         for grid in grids {
-           // print("grille : \(grid)")
+          //  print("grille : \(grid)")
             for eachchild in grid.layer0.children {
-                //print("child : \(eachchild)")
-                //print(convert(point, to: eachchild))
+            //    print("child : \(eachchild)")
+              //  print(convert(point, to: eachchild))
                 if tileShape.contains(convert(point, to: eachchild)) {
                     return eachchild as? Tile
                 }
@@ -185,6 +185,8 @@ class GameScene: SKScene {
                 mainCharacter.digTo(destination: tile)
             case 1 :
                 mainCharacter.moveTo(destination: tile)
+            case 2 :
+                tile.riseUp()
             default: break
             }
 
@@ -256,13 +258,13 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
 
         let refreshTime = currentTime - lastRefresh
-        if  refreshTime > 0.01 {
+        if  refreshTime > 0.2 {
 
             lastRefresh = currentTime
 
             //If friend is lazy
             if !(friend.hasActions()) {
-
+                
                 let random = generateRand(max:tileIndex.count-1)
                 friend.moveTo(destination: tileIndex[random])
 

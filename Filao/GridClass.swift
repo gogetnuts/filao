@@ -30,6 +30,7 @@ class Grid : SKNode {
 
         generateSprites(true)
         zPosition = CGFloat(line)
+        //setTextureMap()
     }
 
     required init(coder: NSCoder) {
@@ -86,6 +87,7 @@ class Grid : SKNode {
     
     func setTextureMap() {
         if level0 == nil {
+            print("go")
             layer0.isHidden = false
             let squareWidth = nbTilePerLine * tileWidth + 20
             let squareHeight = nbTilePerLine * tileHeight + 100

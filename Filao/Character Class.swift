@@ -93,6 +93,16 @@ class characterMovable : SKSpriteNode {
 
         //Draw GlobalPathLine
         let globalPathLine = CGMutablePath()
+
+
+        let tshape = CGMutablePath()
+        tshape.move(to: CGPoint(x:position.x-CGFloat(tileHalfWidth), y:position.y))
+        tshape.addLine(to: CGPoint(x:position.x, y:position.y-CGFloat(tileHalfHeight)))
+        tshape.addLine(to: CGPoint(x:position.x+CGFloat(tileHalfWidth), y:position.y))
+        tshape.addLine(to: CGPoint(x:position.x, y:position.y+CGFloat(tileHalfHeight)))
+        tshape.closeSubpath()
+        globalPathLine.addPath(tshape)
+
         globalPathLine.move(to: position)
 
         //Points left for each point
@@ -108,9 +118,9 @@ class characterMovable : SKSpriteNode {
             let sequencedPathLine = CGMutablePath()
             sequencedPathLine.move(to: lastPoint)
 
-            if let tile = point.tile {
+            if let tile = point.tile, let nextPoint = tile.positionInCamera {
 
-                let nextPoint = tile.positionInCamera
+
 
                 globalPathLine.addLine(to: nextPoint)
                 sequencedPathLine.addLine(to: nextPoint)
@@ -127,6 +137,8 @@ class characterMovable : SKSpriteNode {
             }
             
         }
+
+        //add ending tileShape to globalPathLine
         let tileShape = CGMutablePath()
         tileShape.move(to: CGPoint(x:lastPoint.x-CGFloat(tileHalfWidth), y:lastPoint.y))
         tileShape.addLine(to: CGPoint(x:lastPoint.x, y:lastPoint.y-CGFloat(tileHalfHeight)))
