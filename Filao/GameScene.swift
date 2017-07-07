@@ -35,6 +35,7 @@ class GameScene: SKScene {
     var label : SKTileMapNode?
 
     var friend:characterMovable = characterMovable()
+    var friend2:characterMovable = characterMovable()
 
     override func sceneDidLoad() {
 
@@ -48,32 +49,20 @@ class GameScene: SKScene {
             tileShape.addLine(to: CGPoint(x:0, y:tileHeight/2))
             tileShape.closeSubpath()
 
-            firstCam.setScale(CGFloat(0.75))
-           // firstCam.setScale(1)
-
+            //firstCam.setScale(CGFloat(1))
 
             let newgrid1 = Grid(start: Point(0,0), line:20)
+            let newgrid2 = newgrid1.br
+            let newgrid3 = newgrid2.br
 
-            let tilePerLine = newgrid1.nbTilePerLine //To make sure count is always right
+            let newgrid4 = newgrid1.tr
+            let newgrid5 = newgrid4.br
+            let newgrid6 = newgrid5.br
 
-            let newgrid2 = Grid(start: Point(0,tilePerLine), line:30)
-            newgrid2.position.x += CGFloat(tileHalfWidth * tilePerLine)
-            newgrid2.position.y -= CGFloat(tileHalfHeight * tilePerLine)
+            let newgrid7 = newgrid1.bl
+            let newgrid8 = newgrid7.br
+            let newgrid9 = newgrid8.br
 
-            let newgrid3 = Grid(start: Point(0,tilePerLine * 2), line:40)
-            newgrid3.position.x += CGFloat(tileHalfWidth * tilePerLine * 2)
-            newgrid3.position.y -= CGFloat(tileHalfHeight * tilePerLine * 2)
-
-            let newgrid4 = Grid(start: Point(tilePerLine,0), line:10)
-            newgrid4.position.x += CGFloat(tileHalfWidth * tilePerLine)
-            newgrid4.position.y += CGFloat(tileHalfHeight * tilePerLine)
-
-            let newgrid5 = Grid(start: Point(tilePerLine,tilePerLine), line:20)
-            newgrid5.position.x += CGFloat(tileHalfWidth * tilePerLine * 2)
-
-            let newgrid6 = Grid(start: Point(tilePerLine,tilePerLine * 2), line:30)
-            newgrid6.position.x += CGFloat(tileHalfWidth * tilePerLine * 3)
-            newgrid6.position.y -= CGFloat(tileHalfHeight * tilePerLine)
 
             addChild(firstCam)
 
@@ -83,15 +72,18 @@ class GameScene: SKScene {
             firstCam.addChild(newgrid4)
             firstCam.addChild(newgrid5)
             firstCam.addChild(newgrid6)
+            firstCam.addChild(newgrid7)
+            firstCam.addChild(newgrid8)
+            firstCam.addChild(newgrid9)
 
 
-            if let tile = tileTable[Point(3,3)], let position = tile.positionInCamera {
+            if let tile = tileTable[Point(0,0)], let position = tile.positionInCamera {
                 mainCharacter.position = position
                 mainCharacter.name = "main"
                 firstCam.addChild(mainCharacter)
             }
 
-            if let tile = tileTable[Point(2,2)], let position = tile.positionInCamera {
+            if let tile = tileTable[Point(1,1)], let position = tile.positionInCamera {
                 friend.position = position
                 friend.name = "friend"
                 firstCam.addChild(friend)
@@ -103,8 +95,8 @@ class GameScene: SKScene {
             }
 
             //Centering camera on mainCharacter */
-            firstCam.position.x = -mainCharacter.positionInScene.x
-            firstCam.position.y = -mainCharacter.positionInScene.y
+            //firstCam.position.x = -mainCharacter.positionInScene.x
+            //firstCam.position.y = -mainCharacter.positionInScene.y
 
             firstStart = false
 
@@ -118,7 +110,7 @@ class GameScene: SKScene {
         let grids = self.nodes(at: point).filter ({ $0.isMember(of: Grid.self) }) as! [Grid]
         //print("go")
         for grid in grids {
-          //  print("grille : \(grid)")
+            //  print("grille : \(grid)")
             for eachchild in grid.layer0.children {
             //    print("child : \(eachchild)")
               //  print(convert(point, to: eachchild))
@@ -136,7 +128,7 @@ class GameScene: SKScene {
         return nil*/
     }
 
-    /*
+    
     var lastTile:Tile?
     override func mouseDragged(with event: NSEvent) {
 
@@ -191,7 +183,7 @@ class GameScene: SKScene {
             }
 
             //tile.addPhysics()
-            //tile.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.5))
+            //tile.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1))
         }
     }
 
@@ -242,6 +234,17 @@ class GameScene: SKScene {
             firstCam.run(SKAction.moveBy(x: x, y: y, duration: 0.5))
         }
 
+        if (event.keyCode == 24) {
+            firstCam.xScale += 0.1
+            firstCam.yScale += 0.1
+        }
+        if (event.keyCode == 44) {
+            if (firstCam.xScale > 0.2 && firstCam.yScale > 0.2) {
+                firstCam.xScale -= 0.1
+                firstCam.yScale -= 0.1
+            }
+        }
+
     }
     
     func generateRand(max:Int) -> Int {
@@ -258,7 +261,7 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
 
         let refreshTime = currentTime - lastRefresh
-        if  refreshTime > 0.2 {
+        if  refreshTime > 0.1 {
 
             lastRefresh = currentTime
 
@@ -281,7 +284,7 @@ class GameScene: SKScene {
                 // */
             }
             // */
-
+            /*
             let grids = firstCam.children.filter({ $0.isKind(of: Grid.self)}) as! [Grid]
             let gridToUpdate = grids.filter({ $0.updateBitmap })
 

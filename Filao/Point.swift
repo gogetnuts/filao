@@ -20,12 +20,14 @@ struct Point : Hashable {
     var area:[Point] { return [t, r, b, l, tl, tr, br, bl] }
 
     //Associated newTile?
-    var tile:Tile? { return tileTable[self] }
+    var tile:Tile? {
+        return tileTable[self]
+    }
 
     //Associated Tile isWalkable?
     var isWalkable:Bool {
         if let t = tile {
-            return t.type.walkable
+            return t.walkable
         } else {
             return false
         }

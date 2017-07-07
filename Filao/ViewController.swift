@@ -38,6 +38,7 @@ class ViewController: NSViewController {
     @IBOutlet var SegmentedAction: NSSegmentedControl!
 
     @IBOutlet var dayTimeCorner: NSProgressIndicator!
+    @IBOutlet var autolayer: NSButton!
     @IBOutlet var filterGrid: filterButton!
     override func viewDidLoad() {
         super.viewDidLoad()

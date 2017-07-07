@@ -4,6 +4,7 @@ func getPath (start:Point, goal:Point) -> [Point] {
     var i = 0
 
     if !goal.isWalkable {
+        print("waste avoided")
         return []
     }
 
@@ -44,7 +45,7 @@ func getPath (start:Point, goal:Point) -> [Point] {
 
         closedSet += [current]
 
-
+        //.filter({ if let ok = $0.tile?.type.walkable { return ok } else { return false }})
         for neighbor in current.directArea {
 
 

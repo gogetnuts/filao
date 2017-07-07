@@ -14,17 +14,23 @@ class Tile:SKNode {
     var parentGrid:Grid? {
         if let layer = self.parent as? Layer {
             return layer.grid
-        } else {
-            return nil
-        }
+        } ; return nil
     }
     var point:Point
     var type:tileType
+
     let text:SKLabelNode
-    let level1 = Object()
-    var bound = SKNode()
-    var bitMask:UInt32 = 1
+
     let level0:SKSpriteNode
+    var level1:Object?
+
+    var bound = SKNode()
+    var bitMask:UInt32 = 1 
+
+
+    var walkable:Bool {
+        return type.walkable && level1 == nil
+    }
     //var shape:SKShapeNode
 
     var positionInCamera:CGPoint? {
@@ -42,12 +48,25 @@ class Tile:SKNode {
         text = SKLabelNode(text: "")
         text.fontSize = CGFloat(16)
         text.fontName = "Lucida Grande"
-        text.zPosition = 2
+        text.zPosition = 100000
 
         level0 = SKSpriteNode(texture: type.texture)
         level0.color = NSColor.black
         level0.name = "level0"
-        level0.zPosition = -1
+
+
+
+        if coo == (2,2) || coo == (4,4) || coo == (0,4) {
+            level1 = Object()
+            let texture = SKTexture(image: #imageLiteral(resourceName: "Tree_Iso"))
+            level1?.texture = texture
+            level1?.size = texture.size()
+            level1?.color = NSColor.black
+            level1?.name = "level1"
+            level1?.anchorPoint = CGPoint(x:0.5,y:0)
+            level1?.position.y -= CGFloat(tileHalfHeight)
+        }
+
 
         bound.physicsBody = SKPhysicsBody(edgeFrom: CGPoint(x:-10, y: -5), to:CGPoint(x: 10, y: -5))
         bound.physicsBody?.restitution = 0.5
@@ -55,6 +74,9 @@ class Tile:SKNode {
         super.init()
 
         addChild(level0)
+        if(level1 != nil) {
+            addChild(level1!)
+        }
 
     }
 
@@ -79,7 +101,7 @@ class Tile:SKNode {
     }
 
     func riseUp() {
-        position.y += 10
+        position.y += 5
         parentGrid?.updateBitmap = true
     }
 
@@ -97,7 +119,7 @@ class Tile:SKNode {
         let maxHumidity = 85.0
         let maxcolorBFactorDif = 0.3
 
-        if newHumidity != self.type.humidity && newHumidity >= self.type.humidity + 5  {
+        if newHumidity != self.type.humidity && newHumidity >= self.type.humidity + 2  {
 
             let colorBFac = CGFloat((maxcolorBFactorDif / maxHumidity) * Double(newHumidity))
 
@@ -134,11 +156,12 @@ class Tile:SKNode {
             level0.colorBlendFactor = 0
 
             type.humidity = 100
+            text.text = "100"
 
 
-            level1.texture = nil
-            level1.size = CGSize(width: 0, height: 0)
-            level1.removeFromParent()
+            level1?.texture = nil
+            level1?.size = CGSize(width: 0, height: 0)
+            level1?.removeFromParent()
 
             parentGrid?.updateBitmap = true
 
@@ -213,7 +236,7 @@ struct tileType {
         case .water:
             return SKTexture(image: #imageLiteral(resourceName: "Water_Iso_Center"))
         default:
-            return SKTexture(image: #imageLiteral(resourceName: "grass"))
+            return SKTexture(image: #imageLiteral(resourceName: "grass-1"))
         }
     }
     var crossable:Bool = false

@@ -11,12 +11,38 @@ import SpriteKit
 class Grid : SKNode {
     var line:Int
 
-    let nbTilePerLine = 5
-    let nbLines = 5
+    let nbTilePerLine = 3
+    let nbLines = 3
     let origin:Point
     var level0:SKSpriteNode?
     var updateBitmap:Bool = false
     var layer0:Layer = Layer()
+
+
+    var tl:Grid {
+        let grid = Grid(start: Point(origin.x,origin.y - nbTilePerLine), line:line - 10)
+        grid.position.x = position.x - CGFloat(tileHalfWidth * nbTilePerLine)
+        grid.position.y = position.y + CGFloat(tileHalfHeight * nbTilePerLine)
+        return grid
+    }
+    var br:Grid {
+        let grid = Grid(start: Point(origin.x, origin.y + nbTilePerLine), line:line + 10)
+        grid.position.x = position.x + CGFloat(tileHalfWidth * nbTilePerLine)
+        grid.position.y = position.y - CGFloat(tileHalfHeight * nbTilePerLine)
+        return grid
+    }
+    var tr:Grid {
+        let grid = Grid(start: Point(origin.x + nbTilePerLine,origin.y), line:line - 10)
+        grid.position.x = position.x + CGFloat(tileHalfWidth * nbTilePerLine)
+        grid.position.y = position.y + CGFloat(tileHalfHeight * nbTilePerLine)
+        return grid
+    }
+    var bl:Grid {
+        let grid = Grid(start: Point(origin.x-nbTilePerLine,origin.y), line:line + 10)
+        grid.position.x = position.x - CGFloat(tileHalfWidth * nbTilePerLine)
+        grid.position.y = position.y - CGFloat(tileHalfHeight * nbTilePerLine)
+        return grid
+    }
 
     init(start:Point, line:Int) {
         self.line = line
@@ -24,12 +50,12 @@ class Grid : SKNode {
 
         super.init()
         self.layer0.grid = self
-        layer0.isHidden = true
+        layer0.isHidden = false
         addChild(layer0)
         
 
         generateSprites(true)
-        zPosition = CGFloat(line)
+        //zPosition = CGFloat(line)
         //setTextureMap()
     }
 
@@ -45,6 +71,7 @@ class Grid : SKNode {
 
         var column = 0
 
+        var zPos = 0
         /* Draw Grid loop */
         for i:Int in 0 ..< nbTile {
 
@@ -58,6 +85,7 @@ class Grid : SKNode {
                 column += 1
                 posX = column * tileHalfWidth
                 posY = -column * tileHalfHeight
+                zPos += 1
             }
 
             //Define raw point
@@ -68,13 +96,17 @@ class Grid : SKNode {
 
                 let tile = Tile(coo: ( origin.x + row , origin.y + column ))
                 tile.position = CGPoint(x: posX, y: posY)
+                
+
+                tile.bitMask = UInt32(1 << column)
+                tile.bound.physicsBody?.categoryBitMask = UInt32(1 << column)
+                tile.zPosition = CGFloat(-origin.x + origin.y + zPos - row) * 2 + 400
 
                 layer0.addChild(tile)
                 tileTable[tile.point] = tile
 
-                tile.bitMask = UInt32(1 << column)
-                tile.bound.physicsBody?.categoryBitMask = UInt32(1 << column)
-                tile.zPosition = CGFloat(-row)
+                //tile.level1.zPosition = tile.zPosition + 1
+
 
             }
 
@@ -87,25 +119,27 @@ class Grid : SKNode {
     
     func setTextureMap() {
         if level0 == nil {
-            print("go")
+            print("new texture for Grid\(self.origin.x,self.origin.y)")
             layer0.isHidden = false
             let squareWidth = nbTilePerLine * tileWidth + 20
-            let squareHeight = nbTilePerLine * tileHeight + 100
+            let squareHeight = nbTilePerLine * tileHeight + 200
             let squareSize = CGSize(width: squareWidth, height: squareHeight)
             let squarePoint = CGPoint(x: self.layer0.position.x , y:self.layer0.position.y - CGFloat(squareHeight/2))
             let croppingSquare = CGRect(origin: squarePoint, size: squareSize)
 
             let texture:SKTexture? = self.scene?.view?.texture(from: self.layer0, crop: croppingSquare)
+            //let texture:SKTexture? = self.scene?.view?.texture(from: self.layer0)
             level0 = SKSpriteNode(texture: texture)
 
             level0?.anchorPoint = CGPoint(x:0,y:0.5)
-            level0?.zPosition = -100
+            level0?.zPosition = CGFloat(self.line)
 
             layer0.isHidden = true
             //addChild(layer0)
 
             self.addChild(level0!)
             self.updateBitmap = false
+            print("Grid\(self.origin.x,self.origin.y) is now on demand")
         }
 
     }
@@ -117,6 +151,8 @@ class Grid : SKNode {
 
             level0 = nil
             layer0.isHidden = false
+            print("Grid\(self.origin.x,self.origin.y) is now live")
+
         }
     }
 

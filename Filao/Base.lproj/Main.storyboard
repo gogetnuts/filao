@@ -780,6 +780,7 @@
                     </view>
                     <connections>
                         <outlet property="SegmentedAction" destination="Lgl-Mg-VSs" id="rLF-4y-imd"/>
+                        <outlet property="autolayer" destination="IbO-Vo-sTR" id="5VJ-g6-Op5"/>
                         <outlet property="champ" destination="uhU-Jn-dSx" id="ue3-Vj-I2Q"/>
                         <outlet property="dayTimeCorner" destination="vyg-fD-Y7I" id="39d-kg-Ck4"/>
                         <outlet property="filterGrid" destination="kVl-uB-Me5" id="F1y-7U-ky3"/>

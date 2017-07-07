@@ -29,7 +29,7 @@ class characterMovable : SKSpriteNode {
 
         anchorPoint = CGPoint(x:0.5,y:0)
 
-        zPosition = 30000
+        //zPosition = 30000
 
     }
 
@@ -88,7 +88,7 @@ class characterMovable : SKSpriteNode {
 
         //If not main character
         if(name != "main") {
-            speed /= 2
+            speed /= 4
         }
 
         //Draw GlobalPathLine
@@ -125,14 +125,14 @@ class characterMovable : SKSpriteNode {
                 globalPathLine.addLine(to: nextPoint)
                 sequencedPathLine.addLine(to: nextPoint)
 
-                pathRemaining.removeFirst()
-
                 let action = SKAction.follow(sequencedPathLine, asOffset: false, orientToPath : false, speed: speed)
 
+                //print(pathRemaining)
                 let check = SKAction.checkPath(path: pathRemaining, duration: action.duration)
 
                 sequencedAction += [SKAction.group([action, check])]
 
+                pathRemaining.removeFirst()
                 lastPoint = nextPoint
             }
             
@@ -153,7 +153,7 @@ class characterMovable : SKSpriteNode {
         firstCam.childNode(withName:nameShape)?.removeFromParent()
         let shape = SKShapeNode(path: globalPathLine)
         shape.name = nameShape
-        shape.zPosition = 100
+        shape.zPosition = 10000
         firstCam.addChild(shape)
 
         return SKAction.sequence(sequencedAction)
@@ -187,11 +187,16 @@ extension SKAction {
             if refreshTime > refreshInterval {
 
                 let tiles = path as! [Point]
-                let error = tiles.filter({ !($0.tile?.type.walkable)! }) as [Point]
+
+                let error = tiles.filter({ !($0.tile?.type.walkable)! })
                 if !error.isEmpty {
                     let node = n as! characterMovable
                     node.removeAction(forKey: "Run")
                     node.moveTo(destination: tiles.last!.tile!)
+                }
+
+                if let pos = tiles.first?.tile {
+                    n.zPosition = pos.zPosition + 1
                 }
 
                 lastUpdate = i

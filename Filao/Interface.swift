@@ -12,6 +12,12 @@ import SpriteKit
 class segmentedButton : NSSegmentedControl {
 
 }
+/*
+class filterButton : NSButton  {
+    override open func mouseDown(with event: NSEvent) {
+    }
+
+}*/
 
 class filterButton : NSButton  {
 
@@ -34,11 +40,11 @@ class filterButton : NSButton  {
         case "Level 1" :
             if state == 1 {
                 for (_, tile) in tileTable {
-                    tile.level1.removeFromParent()
+                    tile.level1?.removeFromParent()
                 }
             } else {
                 for (_, tile) in tileTable {
-                    tile.addChild(tile.level1)
+                    //tile.addChild(tile.level1)
                 }
             }
 
